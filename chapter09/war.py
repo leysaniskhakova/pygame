@@ -4,6 +4,7 @@
 
 import cards, games
 
+
 class WarHand(cards.Hand):
 
     def __init__(self, name):
@@ -13,9 +14,13 @@ class WarHand(cards.Hand):
     def __str__(self): 
         return self.name + ": " + super(WarHand, self).__str__()
 
+    def ranks(self):
+      RANKS = cards.Card.RANKS[1:] + cards.Card.RANKS[0:1]
+      return RANKS
+
     def position_card(self):
       card = self.cards[0]
-      return card.get_rank(cards.Card.RANKS)
+      return card.get_rank(WarHand.ranks(self))
 
 
 class WarGame(object):
@@ -48,8 +53,6 @@ class WarGame(object):
         print('-----')
         print('Win:', win)
         
-
-
 
 def main():
     print("\t\tWelcome to War!\n")
