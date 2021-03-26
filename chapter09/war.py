@@ -4,6 +4,10 @@
 
 import cards, games
 
+class WarCard(cards.Card):
+
+    RANKS = cards.Card.RANKS[1:] + cards.Card.RANKS[0:1]
+
 
 class WarHand(cards.Hand):
 
@@ -14,13 +18,10 @@ class WarHand(cards.Hand):
     def __str__(self): 
         return self.name + ": " + super(WarHand, self).__str__()
 
-    def ranks(self):
-      RANKS = cards.Card.RANKS[1:] + cards.Card.RANKS[0:1]
-      return RANKS
 
     def position_card(self):
       card = self.cards[0]
-      return card.get_rank(WarHand.ranks(self))
+      return card.get_rank(WarCard.RANKS)
 
 
 class WarGame(object):
