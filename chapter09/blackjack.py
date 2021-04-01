@@ -26,10 +26,6 @@ class BJ_Deck(cards.Deck):
     
 
 class BJ_Hand(cards.Hand):
-    """ A Blackjack Hand. """
-    def __init__(self, name):
-        super(BJ_Hand, self).__init__()
-        self.name = name
 
     def __str__(self):
         rep = self.name + ":\t" + super(BJ_Hand, self).__str__()  
@@ -67,7 +63,15 @@ class BJ_Hand(cards.Hand):
 
 
 class BJ_Player(BJ_Hand):
+
+    MONEY = 100
     """ A Blackjack Player. """
+
+    def __init__(self, name, bid):
+        super(BJ_Player, self).__init__()
+        self.name = name
+        self.bid = bid
+
     def is_hitting(self):
         response = games.ask_yes_no("\n" + self.name + ", do you want a hit? (Y/N): ")
         return response == "y"
@@ -77,17 +81,25 @@ class BJ_Player(BJ_Hand):
         self.lose()
 
     def lose(self):
+        self.MONEY -= int(self.bid)
         print(self.name, "loses.")
 
     def win(self):
+        self.MONEY += int(self.bid)
         print(self.name, "wins.")
 
     def push(self):
         print(self.name, "pushes.")
 
+
         
 class BJ_Dealer(BJ_Hand):
     """ A Blackjack Dealer. """
+
+    def __init__(self, name):
+        super(BJ_Dealer, self).__init__()
+        self.name = name
+
     def is_hitting(self):
         return self.total < 17
 
@@ -101,10 +113,10 @@ class BJ_Dealer(BJ_Hand):
 
 class BJ_Game(object):
     """ A Blackjack Game. """
-    def __init__(self, names):      
+    def __init__(self, names_bid):      
         self.players = []
-        for name in names:
-            player = BJ_Player(name)
+        for name in names_bid:
+            player = BJ_Player(name, names_bid[name])
             self.players.append(player)
 
         self.dealer = BJ_Dealer("Dealer")
@@ -120,6 +132,12 @@ class BJ_Game(object):
             if not player.is_busted():
                 sp.append(player)
         return sp
+
+    def drop_out(self):
+        for player in self.players:
+          if player.MONEY <= 0:
+            self.players.remove(player)
+            print('The player', player.name, 'has run out of money. Player is eliminated.')
 
     def __additional_cards(self, player):
         while not player.is_busted() and player.is_hitting():
@@ -173,19 +191,28 @@ class BJ_Game(object):
 def main():
     print("\t\tWelcome to Blackjack!\n")
     
-    names = []
+    names_bid = {}
     number = games.ask_number("How many players? (1 - 7): ", low = 1, high = 8)
     for i in range(number):
         name = input("Enter player name: ")
-        names.append(name)
+        bid = input("Enter bid: ")
+        names_bid[name] = bid
     print()
         
-    game = BJ_Game(names)
+    game = BJ_Game(names_bid)
 
     again = None
     while again != "n":
         game.play()
-        again = games.ask_yes_no("\nDo you want to play again?: ")
+        game.drop_out()
+        if game.players:
+          again = games.ask_yes_no("\nDo you want to play again?: ")
+          for player in game.players:
+            print(player.name, ', enter the next rate (remaining money: ', player.MONEY, '):', sep='', end=' ')
+            player.bid = input()
+        else:
+          print('There are no players at the table. Game over.')
+          break
 
 
 main()
