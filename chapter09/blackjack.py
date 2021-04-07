@@ -70,7 +70,6 @@ class BJ_Player(BJ_Hand):
     def __init__(self, name):
         super(BJ_Player, self).__init__()
         self.name = name
-        self.money = randint(50, 300)
 
     def is_hitting(self):
         response = games.ask_yes_no("\n" + self.name + ", do you want a hit? (Y/N): ")
@@ -148,6 +147,10 @@ class BJ_Game(object):
             print(player)
             if player.is_busted():
                 player.bust()
+
+    def money(self):
+        for player in self.players:
+            player.money = randint(50, 300)
            
     def play(self):
         # deal initial 2 cards to everyone
@@ -209,6 +212,7 @@ def main():
     print()
         
     game = BJ_Game(names)
+    game.money()
 
     again = None
     while again != "n":
