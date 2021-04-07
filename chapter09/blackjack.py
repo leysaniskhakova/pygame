@@ -3,7 +3,7 @@
 
 import cards, games
 from random import randint
-from copy import deepcopy
+from copy import copy
 
 class BJ_Card(cards.Card):
     """ A Blackjack Card. """
@@ -67,9 +67,10 @@ class BJ_Hand(cards.Hand):
 class BJ_Player(BJ_Hand):
     """ A Blackjack Player. """
 
-    def __init__(self, name):
+    def __init__(self, name, money):
         super(BJ_Player, self).__init__()
         self.name = name
+        self.money = money
 
     def is_hitting(self):
         response = games.ask_yes_no("\n" + self.name + ", do you want a hit? (Y/N): ")
@@ -115,7 +116,7 @@ class BJ_Game(object):
     def __init__(self, names):      
         self.players = []
         for name in names:
-            player = BJ_Player(name)
+            player = BJ_Player(name, randint(50, 300))
             self.players.append(player)
 
         self.dealer = BJ_Dealer("Dealer")
@@ -133,7 +134,7 @@ class BJ_Game(object):
         return sp
 
     def drop_out(self):
-        checklist = deepcopy(self.players)
+        checklist = copy(self.players)
         self.players.clear()
         for player in checklist:
             if player.money > 0:
@@ -147,10 +148,6 @@ class BJ_Game(object):
             print(player)
             if player.is_busted():
                 player.bust()
-
-    def money(self):
-        for player in self.players:
-            player.money = randint(50, 300)
            
     def play(self):
         # deal initial 2 cards to everyone
@@ -158,8 +155,7 @@ class BJ_Game(object):
         self.dealer.flip_first_card()    # hide dealer's first card
         
         for player in self.players:
-            print(player.name, ', enter you bit (money: ', player.money, '):', sep='', end=' ')
-            player.bid = int(input())
+            player.bid = input_int(f"{player.name}, enter you bit (money: {player.money}): ")
         print()
 
         for player in self.players:
@@ -198,8 +194,17 @@ class BJ_Game(object):
         for player in self.players:
             player.clear()
         self.dealer.clear()
-        
 
+
+def input_int(text=''):
+    while True:
+        try:
+            number = int(input(text))
+            return number
+        except ValueError:
+            pass
+
+        
 def main():
     print("\t\tWelcome to Blackjack!\n")
     
@@ -212,7 +217,6 @@ def main():
     print()
         
     game = BJ_Game(names)
-    game.money()
 
     again = None
     while again != "n":
