@@ -3,6 +3,7 @@
 
 import cards, games
 from random import randint
+from copy import deepcopy
 
 class BJ_Card(cards.Card):
     """ A Blackjack Card. """
@@ -66,10 +67,9 @@ class BJ_Hand(cards.Hand):
 class BJ_Player(BJ_Hand):
     """ A Blackjack Player. """
 
-    def __init__(self, name, bid):
+    def __init__(self, name):
         super(BJ_Player, self).__init__()
         self.name = name
-        self.bid = bid
         self.money = randint(50, 300)
 
     def is_hitting(self):
@@ -81,11 +81,11 @@ class BJ_Player(BJ_Hand):
         self.lose()
 
     def lose(self):
-        self.money -= int(self.bid)
+        self.money -= self.bid
         print(self.name, "loses.")
 
     def win(self):
-        self.money += int(self.bid)
+        self.money += self.bid
         print(self.name, "wins.")
 
     def push(self):
@@ -113,10 +113,10 @@ class BJ_Dealer(BJ_Hand):
 
 class BJ_Game(object):
     """ A Blackjack Game. """
-    def __init__(self, names_bid):      
+    def __init__(self, names):      
         self.players = []
-        for name in names_bid:
-            player = BJ_Player(name, names_bid[name])
+        for name in names:
+            player = BJ_Player(name)
             self.players.append(player)
 
         self.dealer = BJ_Dealer("Dealer")
@@ -134,10 +134,13 @@ class BJ_Game(object):
         return sp
 
     def drop_out(self):
-        for player in self.players:
-          if player.money <= 0:
-            self.players.remove(player)
-            print('The player', player.name, 'has run out of money. Player is eliminated.')
+        checklist = deepcopy(self.players)
+        self.players.clear()
+        for player in checklist:
+            if player.money > 0:
+                self.players.append(player)
+            else:
+                print('The player', player.name, 'has run out of money. Player is eliminated.')
 
     def __additional_cards(self, player):
         while not player.is_busted() and player.is_hitting():
@@ -150,6 +153,12 @@ class BJ_Game(object):
         # deal initial 2 cards to everyone
         self.deck.deal(self.players + [self.dealer], per_hand = 2)
         self.dealer.flip_first_card()    # hide dealer's first card
+        
+        for player in self.players:
+            print(player.name, ', enter you bit (money: ', player.money, '):', sep='', end=' ')
+            player.bid = int(input())
+        print()
+
         for player in self.players:
             print(player)
         print(self.dealer)
@@ -191,15 +200,15 @@ class BJ_Game(object):
 def main():
     print("\t\tWelcome to Blackjack!\n")
     
-    names_bid = {}
+    names = []
     number = games.ask_number("How many players? (1 - 7): ", low = 1, high = 8)
+    print()
     for i in range(number):
         name = input("Enter player name: ")
-        bid = input("Enter bid: ")
-        names_bid[name] = bid
+        names.append(name)
     print()
         
-    game = BJ_Game(names_bid)
+    game = BJ_Game(names)
 
     again = None
     while again != "n":
@@ -207,9 +216,7 @@ def main():
         game.drop_out()
         if game.players:
           again = games.ask_yes_no("\nDo you want to play again?: ")
-          for player in game.players:
-            print(player.name, ', enter the next rate (remaining money: ', player.money, '):', sep='', end=' ')
-            player.bid = input()
+          print()
         else:
           print('There are no players at the table. Game over.')
           break
