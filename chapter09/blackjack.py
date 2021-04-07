@@ -1,7 +1,8 @@
 # Blackjack
 # From 1 to 7 players compete against a dealer
 
-import cards, games     
+import cards, games
+from random import randint
 
 class BJ_Card(cards.Card):
     """ A Blackjack Card. """
@@ -63,14 +64,13 @@ class BJ_Hand(cards.Hand):
 
 
 class BJ_Player(BJ_Hand):
-
-    MONEY = 100
     """ A Blackjack Player. """
 
     def __init__(self, name, bid):
         super(BJ_Player, self).__init__()
         self.name = name
         self.bid = bid
+        self.money = randint(50, 300)
 
     def is_hitting(self):
         response = games.ask_yes_no("\n" + self.name + ", do you want a hit? (Y/N): ")
@@ -81,11 +81,11 @@ class BJ_Player(BJ_Hand):
         self.lose()
 
     def lose(self):
-        self.MONEY -= int(self.bid)
+        self.money -= int(self.bid)
         print(self.name, "loses.")
 
     def win(self):
-        self.MONEY += int(self.bid)
+        self.money += int(self.bid)
         print(self.name, "wins.")
 
     def push(self):
@@ -135,7 +135,7 @@ class BJ_Game(object):
 
     def drop_out(self):
         for player in self.players:
-          if player.MONEY <= 0:
+          if player.money <= 0:
             self.players.remove(player)
             print('The player', player.name, 'has run out of money. Player is eliminated.')
 
@@ -208,7 +208,7 @@ def main():
         if game.players:
           again = games.ask_yes_no("\nDo you want to play again?: ")
           for player in game.players:
-            print(player.name, ', enter the next rate (remaining money: ', player.MONEY, '):', sep='', end=' ')
+            print(player.name, ', enter the next rate (remaining money: ', player.money, '):', sep='', end=' ')
             player.bid = input()
         else:
           print('There are no players at the table. Game over.')
