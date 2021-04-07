@@ -1,7 +1,9 @@
 # Blackjack
 # From 1 to 7 players compete against a dealer
 
-import cards, games     
+import cards, games
+from random import randint
+from copy import copy
 
 class BJ_Card(cards.Card):
     """ A Blackjack Card. """
@@ -26,10 +28,6 @@ class BJ_Deck(cards.Deck):
     
 
 class BJ_Hand(cards.Hand):
-    """ A Blackjack Hand. """
-    def __init__(self, name):
-        super(BJ_Hand, self).__init__()
-        self.name = name
 
     def __str__(self):
         rep = self.name + ":\t" + super(BJ_Hand, self).__str__()  
@@ -68,6 +66,12 @@ class BJ_Hand(cards.Hand):
 
 class BJ_Player(BJ_Hand):
     """ A Blackjack Player. """
+
+    def __init__(self, name, money):
+        super(BJ_Player, self).__init__()
+        self.name = name
+        self.money = money
+
     def is_hitting(self):
         response = games.ask_yes_no("\n" + self.name + ", do you want a hit? (Y/N): ")
         return response == "y"
@@ -77,17 +81,25 @@ class BJ_Player(BJ_Hand):
         self.lose()
 
     def lose(self):
+        self.money -= self.bid
         print(self.name, "loses.")
 
     def win(self):
+        self.money += self.bid
         print(self.name, "wins.")
 
     def push(self):
         print(self.name, "pushes.")
 
+
         
 class BJ_Dealer(BJ_Hand):
     """ A Blackjack Dealer. """
+
+    def __init__(self, name):
+        super(BJ_Dealer, self).__init__()
+        self.name = name
+
     def is_hitting(self):
         return self.total < 17
 
@@ -104,7 +116,7 @@ class BJ_Game(object):
     def __init__(self, names):      
         self.players = []
         for name in names:
-            player = BJ_Player(name)
+            player = BJ_Player(name, randint(50, 300))
             self.players.append(player)
 
         self.dealer = BJ_Dealer("Dealer")
@@ -121,17 +133,38 @@ class BJ_Game(object):
                 sp.append(player)
         return sp
 
+    def drop_out(self):
+        checklist = copy(self.players)
+        self.players.clear()
+        for player in checklist:
+            if player.money > 0:
+                self.players.append(player)
+            else:
+                print('The player', player.name, 'has run out of money. Player is eliminated.')
+
     def __additional_cards(self, player):
         while not player.is_busted() and player.is_hitting():
             self.deck.deal([player])
             print(player)
             if player.is_busted():
                 player.bust()
+
+
+    def __bid(self, player):
+        while True:
+            bid = input_int(f"{player.name}, enter you bit (money: {player.money}): ")
+            if 0 < bid <= player.money:
+                return bid
            
     def play(self):
         # deal initial 2 cards to everyone
         self.deck.deal(self.players + [self.dealer], per_hand = 2)
         self.dealer.flip_first_card()    # hide dealer's first card
+        
+        for player in self.players:
+            player.bid = self.__bid(player)
+        print()
+
         for player in self.players:
             print(player)
         print(self.dealer)
@@ -168,13 +201,23 @@ class BJ_Game(object):
         for player in self.players:
             player.clear()
         self.dealer.clear()
-        
 
+
+def input_int(text=''):
+    while True:
+        try:
+            number = int(input(text))
+            return number
+        except ValueError:
+            pass
+
+        
 def main():
     print("\t\tWelcome to Blackjack!\n")
     
     names = []
     number = games.ask_number("How many players? (1 - 7): ", low = 1, high = 8)
+    print()
     for i in range(number):
         name = input("Enter player name: ")
         names.append(name)
@@ -185,7 +228,13 @@ def main():
     again = None
     while again != "n":
         game.play()
-        again = games.ask_yes_no("\nDo you want to play again?: ")
+        game.drop_out()
+        if game.players:
+          again = games.ask_yes_no("\nDo you want to play again?: ")
+          print()
+        else:
+          print('There are no players at the table. Game over.')
+          break
 
 
 main()
