@@ -148,6 +148,13 @@ class BJ_Game(object):
             print(player)
             if player.is_busted():
                 player.bust()
+
+
+    def __bid(self, player):
+        while True:
+            bid = input_int(f"{player.name}, enter you bit (money: {player.money}): ")
+            if 0 < bid <= player.money:
+                return bid
            
     def play(self):
         # deal initial 2 cards to everyone
@@ -155,7 +162,7 @@ class BJ_Game(object):
         self.dealer.flip_first_card()    # hide dealer's first card
         
         for player in self.players:
-            player.bid = input_int(f"{player.name}, enter you bit (money: {player.money}): ")
+            player.bid = self.__bid(player)
         print()
 
         for player in self.players:

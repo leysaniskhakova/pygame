@@ -62,13 +62,13 @@ class Deck(Hand):
         random.shuffle(self.cards)
 
     def deal(self, hands, per_hand = 1):
+        if len(self.cards) < per_hand * len(hands):
+            self.populate()
+            self.shuffle()
         for rounds in range(per_hand):
             for hand in hands:
-                if self.cards:
-                    top_card = self.cards[0]
-                    self.give(top_card, hand)
-                else:
-                    print("Can't continue deal. Out of cards!")
+                top_card = self.cards[0]
+                self.give(top_card, hand)
 
 
 
