@@ -1,16 +1,20 @@
 
 class Field(object):
 
-    def __init__(self, y_size, x_size):
+    def __init__(self, x_size, y_size):
         self.field = {}
 
-        self.y_line = range(y_size[1], y_size[0]-1, -1)
         self.x_line = range(x_size[0], x_size[1]+1)
+        self.y_line = range(y_size[1], y_size[0]-1, -1)
+
 
         for y in self.y_line:
             for x in self.x_line:
                 coordinate = y, x
                 self.field[coordinate] = '.'
+
+    def dict(self):
+        return self.field
 
     def render(self):
         margin = max(
@@ -32,8 +36,8 @@ class Field(object):
 
 
 if __name__ == "__main__":
-    y_size = 0, 9
-    x_size = 0, 9
+    y_size = 1, 10
+    x_size = 1, 10
 
     voc = Field(y_size, x_size)
     voc.render()
