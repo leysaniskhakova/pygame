@@ -1,5 +1,4 @@
- 
-import field
+from field import Field
 from random import randint
 
 class Player(object):
@@ -26,69 +25,63 @@ class Player(object):
 
 class Moving(object):
 
-    def __init__(self, x_size, y_size, x, y):
+    def __init__(self, x_size, y_size):
         self.x_size = x_size
         self.y_size = y_size
         self.left_border = self.x_size[0]
         self.right_border = self.x_size[1]
         self.top_border = self.y_size[1]
         self.bottom_border = self.y_size[0]
-        self.x = x
-        self.y = y
 
-        self.square = field.Field(self.x_size, self.y_size)
+        self.square = Field(self.x_size, self.y_size)
+
+        self.x_start = randint(self.left_border, self.right_border)
+        self.y_start = randint(self.bottom_border, self.top_border)
+        self.square.field[self.y_start, self.x_start] = '*'
+
+        self.player = Player(self.x_start, self.y_start)
 
     def render(self):
         self.square.render()
 
-    def start(self): 
-        self.x_start = self.x
-        self.y_start = self.y
-        self.player = Player(self.x_start, self.y_start)
-        self.square.field[self.y_start, self.x_start] = '*'
-
-    def player_coordinate(self):
-        self.border_check()
-        self.player = Player(self.x, self.y)
-        if not self.start_coordinate():
-            self.square.field[self.y, self.x] = 'И'
-
     def start_coordinate(self):
-        self.border_check()
-        if self.square.field[self.y, self.x] == '*':
+        if self.square.field[self.player.y, self.player.x] == '*':
             return '*'
 
     def border_check(self):
+        if self.player.x < self.left_border:
+            self.player.x = self.left_border
+        elif self.player.x > self.right_border:
+            self.player.x = self.right_border
+        if self.player.y < self.bottom_border:
+            self.player.y = self.bottom_border
+        elif self.player.y > self.top_border:
+            self.player.y = self.top_border
 
-        if self.x < self.left_border:
-            self.x = self.left_border
-        elif self.x > self.right_border:
-            self.x = self.right_border
-
-        if self.y < self.bottom_border:
-            self.y = self.bottom_border
-        elif self.y > self.top_border:
-            self.y = self.top_border
+    def player_coordinate(self):
+        self.border_check()
+        if not self.start_coordinate():
+            self.square.field[self.player.y, self.player.x] = 'И'
 
     def left_step(self):
         if not self.start_coordinate():
-            self.square.field[self.y, self.x] = '<'
-        self.x = self.player.left()
+            self.square.field[self.player.y, self.player.x] = '<'
+        self.player.left()
 
     def right_step(self):
         if not self.start_coordinate():
-            self.square.field[self.y, self.x] = '>'
-        self.x = self.player.right()
+            self.square.field[self.player.y, self.player.x] = '>'
+        self.player.right()
 
     def step_up(self):
         if not self.start_coordinate():
-            self.square.field[self.y, self.x] = '^'
-        self.y = self.player.up()
+            self.square.field[self.player.y, self.player.x] = '^'
+        self.player.up()
 
     def step_down(self):
         if not self.start_coordinate():
-            self.square.field[self.y, self.x] = 'v'
-        self.y = self.player.down()
+            self.square.field[self.player.y, self.player.x] = 'v'
+        self.player.down()
 
     def play(self, action):
         if action == "a":
@@ -115,10 +108,7 @@ def main():
     x_size = list(map(int, input('Enter the field width (Xmin and Xmax): ').split()))
     y_size = list(map(int, input('Enter the field height (Ymin and Xmax): ').split()))
 
-    x, y = randint(x_size[0], x_size[1]), randint(y_size[0], y_size[1])
-
-    game = Moving(x_size, y_size, x, y)
-    game.start()
+    game = Moving(x_size, y_size)
 
     action = None
     while action != "e":
