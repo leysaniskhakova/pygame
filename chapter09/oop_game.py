@@ -29,12 +29,16 @@ class Moving(object):
     def __init__(self, x_size, y_size, x, y):
         self.x_size = x_size
         self.y_size = y_size
+        self.left_border = self.x_size[0]
+        self.right_border = self.x_size[1]
+        self.top_border = self.y_size[1]
+        self.bottom_border = self.y_size[0]
         self.x = x
         self.y = y
 
         self.square = field.Field(self.x_size, self.y_size)
 
-    def print_field(self):
+    def render(self):
         self.square.render()
 
     def start(self): 
@@ -42,7 +46,6 @@ class Moving(object):
         self.y_start = self.y
         self.player = Player(self.x_start, self.y_start)
         self.square.field[self.y_start, self.x_start] = '*'
-        return self.x_start, self.y_start
 
     def player_coordinate(self):
         self.border_check()
@@ -56,17 +59,16 @@ class Moving(object):
             return '*'
 
     def border_check(self):
-        if self.x < self.x_size[0]:
-            self.x = self.x_size[0]
-        elif self.x > self.x_size[1]:
-            self.x = self.x_size[1]
 
-        if self.y < self.y_size[0]:
-            self.y = self.y_size[0]
-        elif self.y > self.y_size[1]:
-            self.y = self.y_size[1]
+        if self.x < self.left_border:
+            self.x = self.left_border
+        elif self.x > self.right_border:
+            self.x = self.right_border
 
-        return self.x, self.y
+        if self.y < self.bottom_border:
+            self.y = self.bottom_border
+        elif self.y > self.top_border:
+            self.y = self.top_border
 
     def left_step(self):
         if not self.start_coordinate():
@@ -88,19 +90,19 @@ class Moving(object):
             self.square.field[self.y, self.x] = 'v'
         self.y = self.player.down()
 
-    def play(self, again):
-        if again == "a":
+    def play(self, action):
+        if action == "a":
             self.left_step()
-        elif again == "d":
+        elif action == "d":
             self.right_step()
-        elif again == "w":
+        elif action == "w":
             self.step_up()
-        elif again == "s":
+        elif action == "s":
             self.step_down()
         self.player_coordinate()
 
 
-def ask_yes_no(question):
+def ask_for_action(question):
     response = None
     while response not in ("w", "s", "a", "d", "e"):
         response = input(question).lower()
@@ -110,17 +112,18 @@ def ask_yes_no(question):
 def main():
     print("\t\tWelcome!\n")
 
-    x_size = 1, 10
-    y_size = 1, 10
+    x_size = list(map(int, input('Enter the field width (Xmin and Xmax): ').split()))
+    y_size = list(map(int, input('Enter the field height (Ymin and Xmax): ').split()))
+
     x, y = randint(x_size[0], x_size[1]), randint(y_size[0], y_size[1])
 
     game = Moving(x_size, y_size, x, y)
     game.start()
 
-    again = None
-    while again != "e":
-        game.print_field()
-        again = ask_yes_no("""
+    action = None
+    while action != "e":
+        game.render()
+        action = ask_for_action("""
                 Which way to take a step?:
                 w - step up
                 s - step down
@@ -128,7 +131,7 @@ def main():
                 d - step raight
                 e - exit
                 Enter: """)
-        game.play(again)
+        game.play(action)
         print()
 
 print()
