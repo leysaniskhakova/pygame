@@ -28,12 +28,14 @@ class Field(object):
             if coordinate in self.__field.keys():
                 self.__field[coordinate] = '#'
 
-
     def __getitem__(self, coordinate):
         return self.__field[coordinate]
 
     def __setitem__(self, coordinate, symbol):
         self.__field[coordinate] = symbol
+
+    def obstacles(self, y, x):
+        return self.__field[y, x] == '#'
 
     def render(self):
         margin = max(

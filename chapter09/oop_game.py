@@ -50,34 +50,29 @@ class Moving(object):
         self.border_check()
         self.square[self.player.y, self.player.x] = 'И'
 
-    def check_obstacles(self, y, x):
-        if self.square[y, x] == '#':
-            return True
-        return False
-
     def check_step_left(self):
         x_left = self.player.x-1
         if x_left < self.square.left_border:
             x_left = self.square.left_border
-        return self.check_obstacles(self.player.y, x_left)
+        return self.square.obstacles(self.player.y, x_left)
 
     def check_step_right(self):
         x_right = self.player.x+1
         if x_right > self.square.right_border:
             x_right = self.square.right_border
-        return self.check_obstacles(self.player.y, x_right)
+        return self.square.obstacles(self.player.y, x_right)
 
     def check_step_up(self):
         y_up = self.player.y+1
         if y_up > self.square.top_border:
             y_up = self.square.top_border
-        return self.check_obstacles(y_up, self.player.x)
+        return self.square.obstacles(y_up, self.player.x)
 
     def check_step_down(self):
         y_down = self.player.y-1
         if y_down < self.square.bottom_border:
             y_down = self.square.bottom_border
-        return self.check_obstacles(y_down, self.player.x)
+        return self.square.obstacles(y_down, self.player.x)
 
     def step_left(self):
         if not self.check_step_left():
