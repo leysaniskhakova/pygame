@@ -1,4 +1,6 @@
 
+from random import choice 
+
 class Field(object):
 
     def __init__(self, x_size, y_size):
@@ -16,6 +18,16 @@ class Field(object):
             for x in self.x_line:
                 coordinate = y, x
                 self.__field[coordinate] = '.'
+
+        self.__number_of_obstacles = len(self.__field)//3
+        self.__x_let = [choice(self.x_line) for y in range(self.__number_of_obstacles)]
+        self.__y_let = [choice(self.y_line) for y in range(self.__number_of_obstacles)]
+        self.__let = [(self.__y_let[i], self.__x_let[i]) for i in range(self.__number_of_obstacles)]
+
+        for coordinate in self.__let:
+            if coordinate in self.__field.keys():
+                self.__field[coordinate] = 'x'
+
 
     def __getitem__(self, coordinate):
         return self.__field[coordinate]
