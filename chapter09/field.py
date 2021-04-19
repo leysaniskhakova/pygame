@@ -20,13 +20,13 @@ class Field(object):
                 self.__field[coordinate] = '.'
 
         self.__number_of_obstacles = len(self.__field)//3
-        self.__x_let = [choice(self.x_line) for y in range(self.__number_of_obstacles)]
-        self.__y_let = [choice(self.y_line) for y in range(self.__number_of_obstacles)]
-        self.__let = [(self.__y_let[i], self.__x_let[i]) for i in range(self.__number_of_obstacles)]
+        self.__x_obstacles = [choice(self.x_line) for y in range(self.__number_of_obstacles)]
+        self.__y_obstacles = [choice(self.y_line) for y in range(self.__number_of_obstacles)]
+        self.__obstacles = [(self.__y_obstacles[i], self.__x_obstacles[i]) for i in range(self.__number_of_obstacles)]
 
-        for coordinate in self.__let:
+        for coordinate in self.__obstacles:
             if coordinate in self.__field.keys():
-                self.__field[coordinate] = 'x'
+                self.__field[coordinate] = '#'
 
 
     def __getitem__(self, coordinate):
