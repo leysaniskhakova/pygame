@@ -19,10 +19,8 @@ class Field(object):
                 coordinate = y, x
                 self.__field[coordinate] = '.'
 
-        self.__number_of_obstacles = len(self.__field)//3
-        self.__x_obstacles = [choice(self.x_line) for y in range(self.__number_of_obstacles)]
-        self.__y_obstacles = [choice(self.y_line) for y in range(self.__number_of_obstacles)]
-        self.__obstacles = [(self.__y_obstacles[i], self.__x_obstacles[i]) for i in range(self.__number_of_obstacles)]
+        self.__obstacles = [(choice(self.y_line), choice(self.x_line))\
+                            for i in range(len(self.__field)//3)]
 
         for coordinate in self.__obstacles:
             if coordinate in self.__field.keys():
@@ -34,8 +32,11 @@ class Field(object):
     def __setitem__(self, coordinate, symbol):
         self.__field[coordinate] = symbol
 
-    def obstacles(self, y, x):
+    def has_obstacle(self, y, x):
         return self.__field[y, x] == '#'
+
+    def reset_old_position(self, y, x):
+        self.__field[y, x] = '.'
 
     def render(self):
         margin = max(

@@ -43,9 +43,6 @@ class Moving(object):
         elif self.player.y > self.square.top_border:
             self.player.y = self.square.top_border
 
-    def empty_coordinate(self):
-        self.square[self.player.y, self.player.x] = '.'
-
     def player_coordinate(self):
         self.border_check()
         self.square[self.player.y, self.player.x] = 'И'
@@ -54,44 +51,44 @@ class Moving(object):
         x_left = self.player.x-1
         if x_left < self.square.left_border:
             x_left = self.square.left_border
-        return self.square.obstacles(self.player.y, x_left)
+        return self.square.has_obstacle(self.player.y, x_left)
 
     def check_step_right(self):
         x_right = self.player.x+1
         if x_right > self.square.right_border:
             x_right = self.square.right_border
-        return self.square.obstacles(self.player.y, x_right)
+        return self.square.has_obstacle(self.player.y, x_right)
 
     def check_step_up(self):
         y_up = self.player.y+1
         if y_up > self.square.top_border:
             y_up = self.square.top_border
-        return self.square.obstacles(y_up, self.player.x)
+        return self.square.has_obstacle(y_up, self.player.x)
 
     def check_step_down(self):
         y_down = self.player.y-1
         if y_down < self.square.bottom_border:
             y_down = self.square.bottom_border
-        return self.square.obstacles(y_down, self.player.x)
+        return self.square.has_obstacle(y_down, self.player.x)
 
     def step_left(self):
         if not self.check_step_left():
-            self.empty_coordinate()
+            self.square.reset_old_position(self.player.y, self.player.x)
             self.player.left()
     
     def step_right(self):
         if not self.check_step_right():
-            self.empty_coordinate()
+            self.square.reset_old_position(self.player.y, self.player.x)
             self.player.right()
 
     def step_up(self):
         if not self.check_step_up():
-            self.empty_coordinate()
+            self.square.reset_old_position(self.player.y, self.player.x)
             self.player.up()
 
     def step_down(self):
         if not self.check_step_down():
-            self.empty_coordinate()
+            self.square.reset_old_position(self.player.y, self.player.x)
             self.player.down()
 
     def play(self, action):
