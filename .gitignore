@@ -1,0 +1,4 @@
+.gitignore
+__pycache__
+/chapter[0-9]?/*
+!/chapter09/* 
