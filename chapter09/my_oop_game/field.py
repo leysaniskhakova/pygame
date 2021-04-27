@@ -22,11 +22,11 @@ class Field(object):
         self.__obstacles = [(choice(self.y_line), choice(self.x_line))\
                             for i in range(len(self.__field)//3)]
 
-        self.__energy = [(choice(self.y_line), choice(self.x_line))\
-                            for i in range(len(self.__field)//4)]
-
         for coordinate in self.__obstacles:
             self.__field[coordinate] = '#'
+
+        self.__energy = [(choice(self.y_line), choice(self.x_line))\
+                         for i in range(len(self.__field)//4)]
 
         for coordinate in self.__energy:
             self.__field[coordinate] = '+'
@@ -37,14 +37,34 @@ class Field(object):
     def __setitem__(self, coordinate, symbol):
         self.__field[coordinate] = symbol
 
+    def symbol_obstacle(self):
+        return '#'
+
     def has_obstacle(self, y, x):
-        return self.__field[y, x] == '#'
+        return self.__field[y, x] == self.symbol_obstacle()
+
+    def symbol_energy(self):
+        return '+'
 
     def has_energy(self, y, x):
-        return self.__field[y, x] == '+'
+        return self.__field[y, x] == self.symbol_energy()
 
     def reset_old_position(self, y, x):
         self.__field[y, x] = '.'
+
+    def count_symbol_obstacle(self):
+        count = 0
+        for value in self.__field.values():
+            if value == self.symbol_obstacle():
+                count += 1
+        return count
+
+    def count_symbol_energy(self):
+        count = 0
+        for value in self.__field.values():
+            if value == self.symbol_energy():
+                count += 1
+        return count
 
     def render(self):
         margin = max(

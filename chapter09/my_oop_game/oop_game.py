@@ -89,7 +89,7 @@ class Moving(object):
             self.player.down()
 
     def play(self, action):
-        
+
         if action == "a":
             self.step_left()
         elif action == "d":
@@ -143,6 +143,18 @@ def size_y():
     return y_min, y_max
 
 
+def check_game(square, player):
+    if square.count_symbol_energy() == 0 and \
+        player.level_energy() == 0 and \
+        square.count_symbol_obstacle() > 0:
+        print('Losing!')
+        return True
+    elif square.count_symbol_obstacle() == 0 and \
+          square.count_symbol_energy() >= 0:
+        print('Win!')
+        return True
+
+
 def main():
     print("\t\tWelcome!\n")
 
@@ -157,7 +169,7 @@ def main():
 
 
     action = None
-    while action != "e":
+    while not check_game(square, player):
         print()
         print(f'Energy: {player.energy}\n')
         game.render()
@@ -167,7 +179,6 @@ def main():
                 s - step down
                 a - step left
                 d - step right
-                e - exit
                 Enter: """)
         game.play(action)
         print()
