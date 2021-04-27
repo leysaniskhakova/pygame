@@ -1,27 +1,6 @@
 from field import Field
+from player import Player
 from random import randint
-
-class Player(object):
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def left(self):
-        self.x -= 1
-        return self.x
-
-    def right(self):
-        self.x += 1
-        return self.x
-
-    def up(self):
-        self.y += 1
-        return self.y
-
-    def down(self):
-        self.y -= 1
-        return self.y
 
 
 class Moving(object):
@@ -47,29 +26,47 @@ class Moving(object):
         self.border_check()
         self.square[self.player.y, self.player.x] = 'И'
 
+    def player_energy(self, y, x):
+      if self.square.has_energy(y, x):
+        self.player.energy_increased()
+        return False
+      elif self.square.has_obstacle(y, x):
+        return self.annihilation(y, x)
+
+    def annihilation(self, y, x):
+        question = ask_yes_no('Destroy an obstacle for 10 energy units? (y/n)\n')
+        if question:
+          if self.player.level_energy() > 0:
+            self.player.energy_decreased()
+            return False
+          else:
+            print('Lack of energy!')
+            return True
+        return True
+
     def check_step_left(self):
         x_left = self.player.x-1
         if x_left < self.square.left_border:
             x_left = self.square.left_border
-        return self.square.has_obstacle(self.player.y, x_left)
+        return self.player_energy(self.player.y, x_left)
 
     def check_step_right(self):
         x_right = self.player.x+1
         if x_right > self.square.right_border:
             x_right = self.square.right_border
-        return self.square.has_obstacle(self.player.y, x_right)
+        return self.player_energy(self.player.y, x_right)
 
     def check_step_up(self):
         y_up = self.player.y+1
         if y_up > self.square.top_border:
             y_up = self.square.top_border
-        return self.square.has_obstacle(y_up, self.player.x)
+        return self.player_energy(y_up, self.player.x)
 
     def check_step_down(self):
         y_down = self.player.y-1
         if y_down < self.square.bottom_border:
             y_down = self.square.bottom_border
-        return self.square.has_obstacle(y_down, self.player.x)
+        return self.player_energy(y_down, self.player.x)
 
     def step_left(self):
         if not self.check_step_left():
@@ -92,6 +89,7 @@ class Moving(object):
             self.player.down()
 
     def play(self, action):
+        
         if action == "a":
             self.step_left()
         elif action == "d":
@@ -100,7 +98,7 @@ class Moving(object):
             self.step_up()
         elif action == "s":
             self.step_down()
-            
+
         self.player_coordinate()
 
 
@@ -118,6 +116,17 @@ def ask_for_action(question):
     while response not in ("w", "s", "a", "d", "e"):
         response = input(question).lower()
     return response
+
+
+def ask_yes_no(question):
+    """Ask a yes or no question."""
+    response = None
+    while response not in ("y", "n"):
+        response = input(question).lower()
+    if response == "y":
+      return True
+    elif response == "n":
+      return False 
 
 
 def size_x():
@@ -146,8 +155,11 @@ def main():
     game = Moving(square, player)
     game.player_coordinate()
 
+
     action = None
     while action != "e":
+        print()
+        print(f'Energy: {player.energy}\n')
         game.render()
         action = ask_for_action("""
                 Which way to take a step?:

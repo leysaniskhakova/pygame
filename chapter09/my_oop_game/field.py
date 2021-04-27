@@ -22,9 +22,14 @@ class Field(object):
         self.__obstacles = [(choice(self.y_line), choice(self.x_line))\
                             for i in range(len(self.__field)//3)]
 
+        self.__energy = [(choice(self.y_line), choice(self.x_line))\
+                            for i in range(len(self.__field)//4)]
+
         for coordinate in self.__obstacles:
-            if coordinate in self.__field.keys():
-                self.__field[coordinate] = '#'
+            self.__field[coordinate] = '#'
+
+        for coordinate in self.__energy:
+            self.__field[coordinate] = '+'
 
     def __getitem__(self, coordinate):
         return self.__field[coordinate]
@@ -34,6 +39,9 @@ class Field(object):
 
     def has_obstacle(self, y, x):
         return self.__field[y, x] == '#'
+
+    def has_energy(self, y, x):
+        return self.__field[y, x] == '+'
 
     def reset_old_position(self, y, x):
         self.__field[y, x] = '.'
