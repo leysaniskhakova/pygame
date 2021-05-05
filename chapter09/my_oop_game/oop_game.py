@@ -26,67 +26,64 @@ class Moving(object):
         self.border_check()
         self.square[self.player.y, self.player.x] = 'И'
 
-    def player_energy(self, y, x):
-      if self.square.has_energy(y, x):
-        self.player.energy_increased()
-        return False
-      elif self.square.has_obstacle(y, x):
-        return self.annihilation(y, x)
+    def check_energy(self, y, x):
+        if self.square.has_energy(y, x):
+            self.player.energy_increased()
 
-    def annihilation(self, y, x):
+    def check_obstacle(self, y, x):
+        if self.square.has_obstacle(y, x):
+            return self.ask_about_annihilation(y, x)
+
+    def ask_about_annihilation(self, y, x):
         question = ask_yes_no('Destroy an obstacle for 10 energy units? (y/n)\n')
         if question:
-          if self.player.level_energy() > 0:
-            self.player.energy_decreased()
-            return False
-          else:
-            print('Lack of energy!')
-            return True
+            return self.annihilation(question)
         return True
 
-    def check_step_left(self):
+    def annihilation(self, question):
+        if self.player.level_energy() <= 0:
+            print('Lack of energy!')
+            return True
+        else:
+            self.player.energy_decreased()
+            return False
+
+    def step_left(self):
         x_left = self.player.x-1
         if x_left < self.square.left_border:
             x_left = self.square.left_border
-        return self.player_energy(self.player.y, x_left)
+        if not self.check_obstacle(self.player.y, x_left):
+            self.check_energy(self.player.y, x_left)
+            self.square.reset_old_position(self.player.y, self.player.x)
+            self.player.left()
 
-    def check_step_right(self):
+    def step_right(self):
         x_right = self.player.x+1
         if x_right > self.square.right_border:
             x_right = self.square.right_border
-        return self.player_energy(self.player.y, x_right)
-
-    def check_step_up(self):
-        y_up = self.player.y+1
-        if y_up > self.square.top_border:
-            y_up = self.square.top_border
-        return self.player_energy(y_up, self.player.x)
-
-    def check_step_down(self):
-        y_down = self.player.y-1
-        if y_down < self.square.bottom_border:
-            y_down = self.square.bottom_border
-        return self.player_energy(y_down, self.player.x)
-
-    def step_left(self):
-        if not self.check_step_left():
-            self.square.reset_old_position(self.player.y, self.player.x)
-            self.player.left()
-    
-    def step_right(self):
-        if not self.check_step_right():
+        if not self.check_obstacle(self.player.y, x_right):
+            self.check_energy(self.player.y, x_right)
             self.square.reset_old_position(self.player.y, self.player.x)
             self.player.right()
 
     def step_up(self):
-        if not self.check_step_up():
+        y_up = self.player.y+1
+        if y_up > self.square.top_border:
+            y_up = self.square.top_border
+        if not self.check_obstacle(y_up, self.player.x):
+            self.check_energy(y_up, self.player.x)
             self.square.reset_old_position(self.player.y, self.player.x)
             self.player.up()
 
     def step_down(self):
-        if not self.check_step_down():
+        y_down = self.player.y-1
+        if y_down < self.square.bottom_border:
+            y_down = self.square.bottom_border
+        if not self.check_obstacle(y_down, self.player.x):
+            self.check_energy(y_down, self.player.x)
             self.square.reset_old_position(self.player.y, self.player.x)
             self.player.down()
+
 
     def play(self, action):
 
@@ -143,16 +140,21 @@ def size_y():
     return y_min, y_max
 
 
-def check_game(square, player):
-    if square.count_symbol_energy() == 0 and \
+def check_loss(square, player):
+    if square.count_symbol(square.symbol_energy) == 0 and \
         player.level_energy() == 0 and \
-        square.count_symbol_obstacle() > 0:
+        square.count_symbol(square.symbol_obstacle) > 0:
         print('Losing!')
         return True
-    elif square.count_symbol_obstacle() == 0 and \
-          square.count_symbol_energy() >= 0:
+
+def check_win(square, player):
+    if square.count_symbol(square.symbol_obstacle) == 0 and \
+          square.count_symbol(square.symbol_energy) >= 0:
         print('Win!')
         return True
+
+def check_game(square, player):
+    return check_loss(square, player) or heck_win(square, player)
 
 
 def main():
@@ -179,8 +181,12 @@ def main():
                 s - step down
                 a - step left
                 d - step right
+                e - exit
                 Enter: """)
-        game.play(action)
+        if action == 'e':
+            break
+        else:
+            game.play(action)
         print()
 
 print()

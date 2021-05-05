@@ -4,7 +4,7 @@ class Player(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.energy = 10
+        self.energy = 0
 
     def left(self):
         self.x -= 1

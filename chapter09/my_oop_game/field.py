@@ -3,6 +3,11 @@ from random import choice
 
 class Field(object):
 
+    symbol_obstacle = '#'
+    symbol_energy = '+'
+    empty = '.'
+
+
     def __init__(self, x_size, y_size):
         self.__field = {}
 
@@ -17,19 +22,19 @@ class Field(object):
         for y in self.y_line:
             for x in self.x_line:
                 coordinate = y, x
-                self.__field[coordinate] = '.'
+                self.__field[coordinate] = self.empty
 
         self.__obstacles = [(choice(self.y_line), choice(self.x_line))\
                             for i in range(len(self.__field)//3)]
 
         for coordinate in self.__obstacles:
-            self.__field[coordinate] = '#'
+            self.__field[coordinate] = self.symbol_obstacle
 
         self.__energy = [(choice(self.y_line), choice(self.x_line))\
                          for i in range(len(self.__field)//4)]
 
         for coordinate in self.__energy:
-            self.__field[coordinate] = '+'
+            self.__field[coordinate] = self.symbol_energy
 
     def __getitem__(self, coordinate):
         return self.__field[coordinate]
@@ -37,32 +42,20 @@ class Field(object):
     def __setitem__(self, coordinate, symbol):
         self.__field[coordinate] = symbol
 
-    def symbol_obstacle(self):
-        return '#'
 
     def has_obstacle(self, y, x):
-        return self.__field[y, x] == self.symbol_obstacle()
-
-    def symbol_energy(self):
-        return '+'
+        return self.__field[y, x] == self.symbol_obstacle
 
     def has_energy(self, y, x):
-        return self.__field[y, x] == self.symbol_energy()
+        return self.__field[y, x] == self.symbol_energy
 
     def reset_old_position(self, y, x):
-        self.__field[y, x] = '.'
+        self.__field[y, x] = self.empty
 
-    def count_symbol_obstacle(self):
+    def count_symbol(self, symbol):
         count = 0
         for value in self.__field.values():
-            if value == self.symbol_obstacle():
-                count += 1
-        return count
-
-    def count_symbol_energy(self):
-        count = 0
-        for value in self.__field.values():
-            if value == self.symbol_energy():
+            if value == symbol:
                 count += 1
         return count
 
