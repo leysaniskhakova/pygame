@@ -52,12 +52,18 @@ class Field(object):
     def reset_old_position(self, y, x):
         self.__field[y, x] = self.empty
 
-    def count_symbol(self, symbol):
+    def __count_symbol(self, symbol):
         count = 0
         for value in self.__field.values():
             if value == symbol:
                 count += 1
         return count
+
+    def count_energy(self):
+        return self.__count_symbol(self.symbol_energy)
+
+    def count_obstacle(self):
+        return self.__count_symbol(self.symbol_obstacle)
 
     def render(self):
         margin = max(
