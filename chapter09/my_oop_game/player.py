@@ -6,21 +6,12 @@ class Player(object):
         self.y = y
         self.energy = 0
 
-    def left(self):
-        self.x -= 1
-        return self.x
+    def set_coordinates(self, next_coordinates):
+      self.y = next_coordinates[0]
+      self.x = next_coordinates[1]
 
-    def right(self):
-        self.x += 1
-        return self.x
-
-    def up(self):
-        self.y += 1
-        return self.y
-
-    def down(self):
-        self.y -= 1
-        return self.y
+    def get_coordinates(self):
+      return self.y, self.x
 
     def energy_increased(self):
       self.energy += 10
@@ -40,4 +31,5 @@ if __name__ == "__main__":
     x = 1
 
     player = Player(x, y)
+    print(player.get_coordinates())
     print(player)

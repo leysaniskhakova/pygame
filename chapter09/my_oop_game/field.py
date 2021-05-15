@@ -43,14 +43,14 @@ class Field(object):
         self.__field[coordinate] = symbol
 
 
-    def has_obstacle(self, y, x):
-        return self.__field[y, x] == self.symbol_obstacle
+    def has_obstacle(self, coordinate):
+        return self.__field[coordinate] == self.symbol_obstacle
 
-    def has_energy(self, y, x):
-        return self.__field[y, x] == self.symbol_energy
+    def has_energy(self, coordinate):
+        return self.__field[coordinate] == self.symbol_energy
 
-    def reset_old_position(self, y, x):
-        self.__field[y, x] = self.empty
+    def reset_old_position(self, coordinate):
+        self.__field[coordinate] = self.empty
 
     def __count_symbol(self, symbol):
         count = 0

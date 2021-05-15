@@ -12,26 +12,26 @@ class Moving(object):
     def render(self): 
         self.square.render()
 
-    def border_check(self):
-        if self.player.x < self.square.left_border:
-            self.player.x = self.square.left_border
-        elif self.player.x > self.square.right_border:
-            self.player.x = self.square.right_border
-        if self.player.y < self.square.bottom_border:
-            self.player.y = self.square.bottom_border 
-        elif self.player.y > self.square.top_border:
-            self.player.y = self.square.top_border
+    def border_chek(self, y, x):
+        if x < self.square.left_border:
+            x = self.square.left_border
+        elif x > self.square.right_border:
+            x = self.square.right_border
+        if y < self.square.bottom_border:
+            y = self.square.bottom_border 
+        elif y > self.square.top_border:
+            y = self.square.top_border
+        return y, x
 
-    def player_coordinate(self):
-        self.border_check()
-        self.square[self.player.y, self.player.x] = 'И'
+    def player_symbol(self):
+        self.square[self.player.get_coordinates()] = 'И'
 
-    def check_energy(self, y, x):
-        if self.square.has_energy(y, x):
+    def check_energy(self, coordinate):
+        if self.square.has_energy(coordinate):
             self.player.energy_increased()
 
-    def check_obstacle(self, y, x):
-        if not self.square.has_obstacle(y, x):
+    def check_obstacle(self, coordinate):
+        if not self.square.has_obstacle(coordinate):
             return True
         return self.ask_about_annihilation() and self.annihilation()
 
@@ -47,58 +47,24 @@ class Moving(object):
             return False
 
     def step(self, y, x):
-        self.check_energy(y, x)
-        self.square.reset_old_position(self.player.y, self.player.x)
-
-    def step_left(self):
-        x_left = self.player.x-1
-        if x_left < self.square.left_border:
-            x_left = self.square.left_border
-
-        if self.check_obstacle(self.player.y, x_left):
-            self.step(self.player.y, x_left)
-            self.player.left()
-
-    def step_right(self):
-        x_right = self.player.x+1
-        if x_right > self.square.right_border:
-            x_right = self.square.right_border
-
-        if self.check_obstacle(self.player.y, x_right):
-            self.step(self.player.y, x_right)
-            self.player.right()
-
-    def step_up(self):
-        y_up = self.player.y+1
-        if y_up > self.square.top_border:
-            y_up = self.square.top_border
-
-        if self.check_obstacle(y_up, self.player.x):
-            self.step(y_up, self.player.x)
-            self.player.up()
-
-    def step_down(self):
-        y_down = self.player.y-1
-        if y_down < self.square.bottom_border:
-            y_down = self.square.bottom_border
-            
-        if self.check_obstacle(y_down, self.player.x):
-            self.step(y_down, self.player.x)
-            self.player.down()
-
+        next_coordinates = self.border_chek(y, x)
+        if self.check_obstacle(next_coordinates):
+            self.check_energy(next_coordinates)
+            self.square.reset_old_position(self.player.get_coordinates())
+            self.player.set_coordinates(next_coordinates)
 
     def play(self, action):
 
         if action == "a":
-            self.step_left()
+            self.step(self.player.y, self.player.x-1)
         elif action == "d":
-            self.step_right()
+            self.step(self.player.y, self.player.x+1)
         elif action == "w":
-            self.step_up()
+            self.step(self.player.y+1, self.player.x)
         elif action == "s":
-            self.step_down()
+            self.step(self.player.y-1, self.player.x)
 
-        self.player_coordinate()
+        self.player_symbol()
 
 
 def input_int(text=''):
@@ -169,7 +135,7 @@ def main():
     player = Player(randint(x_size[0], x_size[1]), randint(y_size[0], y_size[1]))
 
     game = Moving(square, player)
-    game.player_coordinate()
+    game.player_symbol()
 
 
     action = None
