@@ -23,14 +23,14 @@ class Moving(object):
             y = self.square.top_border
         return y, x
 
-    def player_symbol(self):
+    def update_player_position(self):
         self.square[self.player.get_coordinates()] = 'И'
 
     def check_energy(self, coordinate):
         if self.square.has_energy(coordinate):
             self.player.energy_increased()
 
-    def check_obstacle(self, coordinate):
+    def ensure_no_obstacle(self, coordinate):
         if not self.square.has_obstacle(coordinate):
             return True
         return self.ask_about_annihilation() and self.annihilation()
@@ -48,10 +48,11 @@ class Moving(object):
 
     def step(self, y, x):
         next_coordinates = self.border_chek(y, x)
-        if self.check_obstacle(next_coordinates):
+        if self.ensure_no_obstacle(next_coordinates):
             self.check_energy(next_coordinates)
             self.square.reset_old_position(self.player.get_coordinates())
             self.player.set_coordinates(next_coordinates)
+            self.update_player_position()
 
     def play(self, action):
 
@@ -63,9 +64,6 @@ class Moving(object):
             self.step(self.player.y+1, self.player.x)
         elif action == "s":
             self.step(self.player.y-1, self.player.x)
-
-        self.player_symbol()
-
 
 def input_int(text=''):
     while True:
@@ -135,7 +133,7 @@ def main():
     player = Player(randint(x_size[0], x_size[1]), randint(y_size[0], y_size[1]))
 
     game = Moving(square, player)
-    game.player_symbol()
+    game.update_player_position()
 
 
     action = None
