@@ -23,14 +23,17 @@ class Player(object):
         self.y -= 1
         return self.y
 
+    def get_player_coordinate(self):
+        return self.y, self.x
+
 class Moving(object):
 
     def __init__(self, x_size, y_size):
  
         self.square = Field(x_size, y_size)
 
-        self.x_start = randint(self.square.left_border, self.square.right_border)
-        self.y_start = randint(self.square.bottom_border, self.square.top_border)
+        self.x_start = randint(self.square.left_border+1, self.square.right_border-1)
+        self.y_start = randint(self.square.bottom_border+1, self.square.top_border-1)
 
         self.square[self.y_start, self.x_start] = '*'
 
@@ -45,17 +48,24 @@ class Moving(object):
         return False
 
     def border_check(self):
-        if self.player.x < self.square.left_border:
-            self.player.x = self.square.left_border
-        elif self.player.x > self.square.right_border:
-            self.player.x = self.square.right_border
-        if self.player.y < self.square.bottom_border:
-            self.player.y = self.square.bottom_border
-        elif self.player.y > self.square.top_border:
-            self.player.y = self.square.top_border
+        if self.player.x < self.square.left_border+1:
+            self.player.x = self.square.left_border+1
+        elif self.player.x > self.square.right_border-1:
+            self.player.x = self.square.right_border-1
+        if self.player.y < self.square.bottom_border+1:
+            self.player.y = self.square.bottom_border+1
+        elif self.player.y > self.square.top_border-1:
+            self.player.y = self.square.top_border -1
 
-    def player_coordinate(self):
-        self.border_check()
+    def exit_check(self):
+        if self.player.get_player_coordinate() != self.square.exit_coordinate():
+            self.border_check()
+            self.player_symbol()
+            return True
+        else:
+            return False
+
+    def player_symbol(self):
         if not self.start_coordinate():
             self.square[self.player.y, self.player.x] = 'И'
 
@@ -88,7 +98,9 @@ class Moving(object):
             self.step_up()
         elif action == "s":
             self.step_down()
-        self.player_coordinate()
+
+        self.exit_check()
+
 
 def input_int(text=''):
     while True:
@@ -104,32 +116,38 @@ def ask_for_action(question):
         response = input(question).lower()
     return response
 
+
 def main():
     print("\t\tWelcome!\n")
 
-    print('Enter the field width:')
-    x_min = input_int('Xmin = ')
-    x_max = input_int('Xmax = ')
-
-    print('Enter the field width:')
-    y_min = input_int('Ymin = ')
-    y_max = input_int('Ymax = ')
-
-    game = Moving((x_min, x_max), (y_min, y_max))
-
     action = None
-    while action != "e":
-        game.render()
-        action = ask_for_action("""
-                Which way to take a step?:
-                w - step up
-                s - step down
-                a - step left
-                d - step raight
-                e - exit
-                Enter: """)
-        game.play(action)
-        print()
+
+    x, y = 1, 5
+    while y <= 11:
+        
+        game = Moving(*[(x, y), (x, y)])
+
+        while game.exit_check() and action != 'e':
+            game.render()
+            action = ask_for_action("""
+                    Which way to take a step?:
+                    w - step up
+                    s - step down
+                    a - step left
+                    d - step raight
+                    e - exit
+                    Enter: """)
+            game.play(action)
+            print()
+
+        if action == 'e':
+            print('Come back!')
+            break
+        elif y == 8 or y == 5:
+            print('Next level!')
+        elif y == 11:
+            print('You have found a way out!')
+        y += 3
 
 print()
 main()
