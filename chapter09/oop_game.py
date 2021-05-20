@@ -35,7 +35,7 @@ class Moving(object):
         self.x_start = randint(self.square.left_border+1, self.square.right_border-1)
         self.y_start = randint(self.square.bottom_border+1, self.square.top_border-1)
 
-        self.square[self.y_start, self.x_start] = '*'
+        self.square[self.y_start, self.x_start] = self.__out_yellow('*')
 
         self.player = Player(self.x_start, self.y_start)
 
@@ -43,7 +43,7 @@ class Moving(object):
         self.square.render()
 
     def start_coordinate(self):
-        if self.square[self.player.y, self.player.x] == '*':
+        if self.square[self.player.y, self.player.x] == self.__out_yellow('*'):
             return True
         return False
 
@@ -65,28 +65,31 @@ class Moving(object):
         else:
             return False
 
+    def __out_yellow(self, text):
+        return f'\033[33m{text:>{self.square.margin()}s}\033[0m'
+
     def player_symbol(self):
         if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = 'И'
+            self.square[self.player.y, self.player.x] = self.__out_yellow('И')
 
     def step_left(self):
         if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = '<'
+            self.square[self.player.y, self.player.x] = self.square.out_green('<')
         self.player.left()
 
     def step_right(self):
         if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = '>'
+            self.square[self.player.y, self.player.x] = self.square.out_green('>')
         self.player.right()
 
     def step_up(self):
         if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = '^'
+            self.square[self.player.y, self.player.x] = self.square.out_green('^')
         self.player.up()
 
     def step_down(self):
         if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = 'v'
+            self.square[self.player.y, self.player.x] = self.square.out_green('v')
         self.player.down()
 
     def play(self, action):
