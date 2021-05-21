@@ -1,5 +1,9 @@
+#!/usr/bin/python3
+
 from field import Field
 from random import randint
+import os
+import sys
 
 class Player(object):
 
@@ -119,9 +123,14 @@ def ask_for_action(question):
         response = input(question).lower()
     return response
 
+def print_string(string, margin):
+    print(f'\033[33m{string:>{margin}s}\033[0m')
+
+def out_turquoise(string):
+    print(f'\033[1m\033[36m{string}\033[0m')
+
 
 def main():
-    print("\t\tWelcome!\n")
 
     action = None
 
@@ -131,7 +140,18 @@ def main():
         game = Moving(*[(x, y), (x, y)])
 
         while game.exit_check() and action != 'e':
+
+            out_turquoise('\t\tWelcome!\n')
+
+            if y == 5:
+                print_string('First level!\n', 22)
+            elif y == 8:
+                print_string('Second level!\n', 26)
+            elif y == 11:
+                print_string('Third level!\n', 34)
+
             game.render()
+
             action = ask_for_action("""
                     Which way to take a step?:
                     w - step up
@@ -142,15 +162,22 @@ def main():
                     Enter: """)
             game.play(action)
             print()
+        
+            os.system('cls' if os.name == 'nt' else 'clear')
 
         if action == 'e':
-            print('Come back!')
+            out_turquoise('\n\t\tCome back!')
             break
-        elif y == 8 or y == 5:
-            print('Next level!')
         elif y == 11:
-            print('You have found a way out!')
+            out_turquoise('\n\tCongratulations! You have found a way out!')
+
         y += 3
 
-print()
-main()
+# print()
+# main()
+
+if __name__ == "__main__":
+    print()
+    main()
+    input()
+    sys.exit()
