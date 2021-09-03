@@ -20,11 +20,11 @@ class Player(object):
         return self.x
 
     def up(self):
-        self.y += 1
+        self.y -= 1
         return self.y
 
     def down(self):
-        self.y -= 1
+        self.y += 1
         return self.y
 
     def get_player_coordinate(self):

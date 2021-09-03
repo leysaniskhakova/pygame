@@ -17,12 +17,12 @@ class Field(object):
         self.top_border = y_size[1]
         self.bottom_border = y_size[0]
 
-        self.x_line = range(x_size[0], x_size[1]+1)
-        self.y_line = range(y_size[1], y_size[0]-1, -1)
+        self.x_line = [x for x in range(x_size[0], x_size[1]+1)]
+        self.y_line = [y for y in range(y_size[0], y_size[1]+1)]
 
         self.__exit = random.choice(\
-                    [(random.choice(y_size), random.randint(self.left_border+1, self.right_border-1)),\
-                     (random.randint(self.bottom_border+1, self.top_border-1), random.choice(y_size))])
+                    [(random.choice(y_size), random.randint(self.x_line[1], self.x_line[-2])),\
+                    (random.randint(self.y_line[1], self.y_line[-2]), random.choice(x_size))])
 
         for y in self.y_line:
             for x in self.x_line:
@@ -30,7 +30,7 @@ class Field(object):
                 self.__field[coordinate] = self.out_green(self.cell)
                 if coordinate != self.__exit:
                     if x == self.left_border or x == self.right_border:
-                        self.__field[y-1, x] = self.__back_green(self.y_border)
+                        self.__field[y+1, x] = self.__back_green(self.y_border)
                         self.__field[y, x] = self.__back_green(self.x_border)
                     if y == self.top_border or y == self.bottom_border:
                         self.__field[y, x] = self.__back_green(self.y_border)
@@ -62,8 +62,8 @@ class Field(object):
 
     def margin(self):    
         margin = max(
-                len(str(self.x_line.start)),
-                len(str(self.x_line.stop-1))
+                len(str(self.x_line[0])),
+                len(str(self.x_line[-1]))
             )+1
         return margin
 
@@ -84,9 +84,11 @@ class Field(object):
 
 
 if __name__ == "__main__":
-    y_size = 1, 10
-    x_size = 1, 10
+    x_size = -15, -5
+    y_size = -10, 0
 
     voc = Field(x_size, y_size)
     voc.render()
+    print(voc.x_line, voc.x_line[1:-1])
+    print(voc.y_line, voc.y_line[1:-1])
     print(voc.exit_coordinate())
