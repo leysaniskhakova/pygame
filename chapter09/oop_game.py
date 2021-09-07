@@ -1,36 +1,15 @@
 #!/usr/bin/python3
 
 from field import Field
+from player import Player
+import desing
 from random import randint
-import os
 import sys
 
-class Player(object):
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def left(self):
-        self.x -= 1
-        return self.x
-
-    def right(self):
-        self.x += 1
-        return self.x
-
-    def up(self):
-        self.y -= 1
-        return self.y
-
-    def down(self):
-        self.y += 1
-        return self.y
-
-    def get_player_coordinate(self):
-        return self.y, self.x
 
 class Moving(object):
+
+    player_on_the_field = '*'
 
     def __init__(self, x_size, y_size):
  
@@ -39,17 +18,13 @@ class Moving(object):
         self.x_start = randint(self.square.left_border+1, self.square.right_border-1)
         self.y_start = randint(self.square.bottom_border+1, self.square.top_border-1)
 
-        self.square[self.y_start, self.x_start] = self.square.out_yellow('*')
+        self.player_on_the_field = desing.back_purple(
+                                    desing.alignment(self.player_on_the_field, self.square.margin()))
 
         self.player = Player(self.x_start, self.y_start)
 
     def render(self): 
         self.square.render()
-
-    def start_coordinate(self):
-        if self.square[self.player.y, self.player.x] == self.square.out_yellow('*'):
-            return True
-        return False
 
     def border_check(self):
         if self.player.x < self.square.left_border+1:
@@ -70,27 +45,25 @@ class Moving(object):
             return False
 
     def player_symbol(self):
-        if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = self.square.out_yellow('И')
+        self.square[self.player.y, self.player.x] = self.player_on_the_field
+
+    def field_cell(self):
+        self.square[self.player.y, self.player.x] = self.square.cell
 
     def step_left(self):
-        if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = self.square.out_green('<')
+        self.field_cell()
         self.player.left()
 
     def step_right(self):
-        if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = self.square.out_green('>')
+        self.field_cell()
         self.player.right()
 
     def step_up(self):
-        if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = self.square.out_green('^')
+        self.field_cell()
         self.player.up()
 
     def step_down(self):
-        if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = self.square.out_green('v')
+        self.field_cell()
         self.player.down()
 
     def play(self, action):
@@ -106,13 +79,31 @@ class Moving(object):
         self.exit_check()
 
 
-def input_int(text=''):
+def input_int(parameter, text=''):
     while True:
+        print(f'{parameter}: ', end='')
         try:
             number = int(input(text))
-            return number
+            if number > 0:
+                return number
+            else:
+                print(desing.out_red('\nThe number must be positive!'))
         except ValueError:
+            print(desing.out_red('\nEnter the number!'))
             pass
+
+def first_level():
+    print(desing.out_green('\nEnter the size of the first playing field (number of cells in height and width):'))
+    return input_int(desing.out_blue('\nwidth'))+1, input_int(desing.out_blue('\nheight'))+1
+
+def next_level():
+    print(desing.out_green('\nSelect how many cells the next field will be larger than the previous one'))
+    return input_int(desing.out_blue('\nrise'))
+
+def last_level():
+    print(desing.out_green('\nEnter the number of levels'))
+    return input_int(desing.out_blue('\nlevels'))
+
 
 def ask_for_action(question):
     response = None
@@ -120,53 +111,65 @@ def ask_for_action(question):
         response = input(question).lower()
     return response
 
-def print_string(string, margin):
-    print(f'\033[33m{string:>{margin}s}\033[0m')
+def input_data():
+    level_fields = {}
+    start = 0
+    width, height = first_level()
+    rise, levels = next_level(), last_level()
+
+    for level in range(1, levels+1):
+        level_fields[level] = [(start, width), (start, height)]
+        width += rise
+        height += rise
+    
+    return level_fields
+
+def step_question():
+    return """
+Which way to take a step?:
+w - step up
+s - step down
+a - step left
+d - step raight
+e - exit
+Enter: """
+
 
 
 def main():
 
-    action = None
+    print(desing.out_yellow('\t\tWelcome!\n'))
+    
+    level_and_field = input_data()
 
-    x, y = 1, 5
-    while y <= 11:
-        
-        game = Moving(*[(x, y), (x, y)])
+    desing.clear()
+
+    number_of_levels = 0
+
+    for level in level_and_field:
+        size_field = level_and_field[level]
+
+        game = Moving(*size_field)
+
+        action = None
 
         while game.exit_check() and action != 'e':
-
-            Field.out_turquoise('\t\tWelcome!\n')
-
-            if y == 5:
-                print_string('First level!\n', 22)
-            elif y == 8:
-                print_string('Second level!\n', 26)
-            elif y == 11:
-                print_string('Third level!\n', 34)
-
+            print(desing.out_yellow(f'\t\tlevel: {level}\n'))
             game.render()
-
-            action = ask_for_action("""
-                    Which way to take a step?:
-                    w - step up
-                    s - step down
-                    a - step left
-                    d - step raight
-                    e - exit
-                    Enter: """)
+            action = ask_for_action(desing.out_red(step_question()))
             game.play(action)
             print()
         
-            os.system('cls' if os.name == 'nt' else 'clear')
+            desing.clear()
 
         if action == 'e':
-            Field.out_turquoise('\n\t\tCome back!')
+            print(desing.out_yellow('\n\t\tCome back!'))
             break
-        elif y == 11:
-            Field.out_turquoise('\n\tCongratulations! You have found a way out!')
+            
+        number_of_levels += 1
 
-        y += 3
-
+    if number_of_levels == len(level_and_field):
+        print(desing.out_yellow('\n\tCongratulations!\n\tYou have found a way out!'))
 
 if __name__ == "__main__":
     print()

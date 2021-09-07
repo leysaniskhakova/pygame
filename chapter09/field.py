@@ -1,13 +1,11 @@
 import random
+import desing
 
 
 class Field(object):
 
     cell = '.'
     empty = ' '
-    y_border = '_'
-    x_border = '|'
-
 
     def __init__(self, x_size, y_size):
         self.__field = {}
@@ -24,16 +22,17 @@ class Field(object):
                     [(random.choice(y_size), random.randint(self.x_line[1], self.x_line[-2])),\
                     (random.randint(self.y_line[1], self.y_line[-2]), random.choice(x_size))])
 
+        self.cell = desing.out_green(desing.alignment(self.cell, self.margin()))
+
         for y in self.y_line:
             for x in self.x_line:
                 coordinate = y, x
-                self.__field[coordinate] = self.out_green(self.cell)
+                self.__field[coordinate] = self.cell
                 if coordinate != self.__exit:
                     if x == self.left_border or x == self.right_border:
-                        self.__field[y+1, x] = self.__back_green(self.y_border)
-                        self.__field[y, x] = self.__back_green(self.x_border)
+                        self.__field[coordinate] = desing.back_green(self.cell)
                     if y == self.top_border or y == self.bottom_border:
-                        self.__field[y, x] = self.__back_green(self.y_border)
+                        self.__field[coordinate] = desing.back_green(self.cell)
                 else:
                     self.__field[coordinate] = self.empty
                     
@@ -47,17 +46,6 @@ class Field(object):
     def exit_coordinate(self):
         return self.__exit
 
-    def __back_green(self, text):
-        return f'\033[32m\033[42m{text:{self.margin()}s}\033[0m'
-
-    def out_green(self, text):
-        return f'\033[2m\033[32m{text:{self.margin()}s}\033[0m'
-
-    def out_yellow(self, text):
-        return f'\033[33m{text:>{self.margin()}s}\033[0m'
-
-    def out_turquoise(string):
-        print(f'\033[1m\033[36m{string}\033[0m')
 
     def margin(self):    
         margin = max(
@@ -67,30 +55,19 @@ class Field(object):
         return margin
 
     def render(self):
-
         for y in self.y_line:
-
-            if y == self.y_line[0] or y == self.y_line[-1]:
-                print(self.out_green(f'{"":10s}'), end='')
-            else:
-                print(self.out_green(f'{y:10d}'), end='')
-
+            print(desing.out_green(f'{"":10s}'), end='')
             for x in self.x_line:
                 coordinate = y, x
-                print(f'{self.__field[coordinate]:>{self.margin()}s}', end='')
-
+                print(f'{self.__field[coordinate]:{self.margin()}s}', end='')
             print()
-
-        x_line = f'{"":10s}'
-        for x in self.x_line[1:-1]:
-            x_line += f'{x:{self.margin()}d}'
-        print(self.out_green(x_line))
+        print(desing.out_green(f'{"":10s}'))
 
 
 
 if __name__ == "__main__":
-    x_min, x_max = 1, 10
-    y_min, y_max = 1, 10
+    x_min, x_max = 1, 5
+    y_min, y_max = 1, 5
 
     x_size = x_min-1, x_max+1
     y_size = y_min-1, y_max+1
@@ -102,3 +79,4 @@ if __name__ == "__main__":
     print(voc.x_line, voc.x_line[1:-1])
     print(voc.y_line, voc.y_line[1:-1])
     print(voc.exit_coordinate())
+    
