@@ -39,7 +39,7 @@ class Moving(object):
         self.x_start = randint(self.square.left_border+1, self.square.right_border-1)
         self.y_start = randint(self.square.bottom_border+1, self.square.top_border-1)
 
-        self.square[self.y_start, self.x_start] = self.__out_yellow('*')
+        self.square[self.y_start, self.x_start] = self.square.out_yellow('*')
 
         self.player = Player(self.x_start, self.y_start)
 
@@ -47,7 +47,7 @@ class Moving(object):
         self.square.render()
 
     def start_coordinate(self):
-        if self.square[self.player.y, self.player.x] == self.__out_yellow('*'):
+        if self.square[self.player.y, self.player.x] == self.square.out_yellow('*'):
             return True
         return False
 
@@ -69,12 +69,9 @@ class Moving(object):
         else:
             return False
 
-    def __out_yellow(self, text):
-        return f'\033[33m{text:>{self.square.margin()}s}\033[0m'
-
     def player_symbol(self):
         if not self.start_coordinate():
-            self.square[self.player.y, self.player.x] = self.__out_yellow('И')
+            self.square[self.player.y, self.player.x] = self.square.out_yellow('И')
 
     def step_left(self):
         if not self.start_coordinate():
@@ -126,9 +123,6 @@ def ask_for_action(question):
 def print_string(string, margin):
     print(f'\033[33m{string:>{margin}s}\033[0m')
 
-def out_turquoise(string):
-    print(f'\033[1m\033[36m{string}\033[0m')
-
 
 def main():
 
@@ -141,7 +135,7 @@ def main():
 
         while game.exit_check() and action != 'e':
 
-            out_turquoise('\t\tWelcome!\n')
+            Field.out_turquoise('\t\tWelcome!\n')
 
             if y == 5:
                 print_string('First level!\n', 22)
@@ -166,15 +160,13 @@ def main():
             os.system('cls' if os.name == 'nt' else 'clear')
 
         if action == 'e':
-            out_turquoise('\n\t\tCome back!')
+            Field.out_turquoise('\n\t\tCome back!')
             break
         elif y == 11:
-            out_turquoise('\n\tCongratulations! You have found a way out!')
+            Field.out_turquoise('\n\tCongratulations! You have found a way out!')
 
         y += 3
 
-# print()
-# main()
 
 if __name__ == "__main__":
     print()

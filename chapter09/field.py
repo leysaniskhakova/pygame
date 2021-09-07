@@ -36,14 +36,7 @@ class Field(object):
                         self.__field[y, x] = self.__back_green(self.y_border)
                 else:
                     self.__field[coordinate] = self.empty
-
-        if self.__exit[1] == self.left_border or self.__exit[1] == self.right_border:
-            self.__field[self.__exit[0]-1, self.__exit[1]] = self.__back_green(self.y_border)
-            self.__field[self.__exit[0]+1, self.__exit[1]] = self.__back_green(self.y_border)
-        elif self.__exit[0] == self.top_border or self.__exit[0] == self.bottom_border:
-            self.__field[self.__exit[0], self.__exit[1]-1] = self.__back_green(self.x_border)
-            self.__field[self.__exit[0], self.__exit[1]+1] = self.__back_green(self.x_border)
-
+                    
     
     def __getitem__(self, coordinate):
         return self.__field[coordinate]
@@ -60,6 +53,12 @@ class Field(object):
     def out_green(self, text):
         return f'\033[2m\033[32m{text:{self.margin()}s}\033[0m'
 
+    def out_yellow(self, text):
+        return f'\033[33m{text:>{self.margin()}s}\033[0m'
+
+    def out_turquoise(string):
+        print(f'\033[1m\033[36m{string}\033[0m')
+
     def margin(self):    
         margin = max(
                 len(str(self.x_line[0])),
@@ -70,22 +69,33 @@ class Field(object):
     def render(self):
 
         for y in self.y_line:
-            print(self.out_green(f'{y: 10d}'), end='')
+
+            if y == self.y_line[0] or y == self.y_line[-1]:
+                print(self.out_green(f'{"":10s}'), end='')
+            else:
+                print(self.out_green(f'{y:10d}'), end='')
+
             for x in self.x_line:
                 coordinate = y, x
                 print(f'{self.__field[coordinate]:>{self.margin()}s}', end='')
+
             print()
 
         x_line = f'{"":10s}'
-        for x in self.x_line:
+        for x in self.x_line[1:-1]:
             x_line += f'{x:{self.margin()}d}'
         print(self.out_green(x_line))
 
 
 
 if __name__ == "__main__":
-    x_size = -15, -5
-    y_size = -10, 0
+    x_min, x_max = 1, 10
+    y_min, y_max = 1, 10
+
+    x_size = x_min-1, x_max+1
+    y_size = y_min-1, y_max+1
+
+    print(x_size, y_size)
 
     voc = Field(x_size, y_size)
     voc.render()
