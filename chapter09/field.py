@@ -1,5 +1,5 @@
 import random
-import desing
+import formatter
 
 
 class Field(object):
@@ -22,7 +22,7 @@ class Field(object):
                     [(random.choice(y_size), random.randint(self.x_line[1], self.x_line[-2])),\
                     (random.randint(self.y_line[1], self.y_line[-2]), random.choice(x_size))])
 
-        self.cell = desing.out_green(desing.alignment(self.cell, self.margin()))
+        self.cell = formatter.fg_green(formatter.alignment(self.cell, self.margin()))
 
         for y in self.y_line:
             for x in self.x_line:
@@ -30,9 +30,9 @@ class Field(object):
                 self.__field[coordinate] = self.cell
                 if coordinate != self.__exit:
                     if x == self.left_border or x == self.right_border:
-                        self.__field[coordinate] = desing.back_green(self.cell)
+                        self.__field[coordinate] = formatter.bg_green(self.cell)
                     if y == self.top_border or y == self.bottom_border:
-                        self.__field[coordinate] = desing.back_green(self.cell)
+                        self.__field[coordinate] = formatter.bg_green(self.cell)
                 else:
                     self.__field[coordinate] = self.empty
                     
@@ -56,12 +56,13 @@ class Field(object):
 
     def render(self):
         for y in self.y_line:
-            print(desing.out_green(f'{"":10s}'), end='')
+            print(formatter.fg_green(formatter.alignment("", 10)), end='')
             for x in self.x_line:
                 coordinate = y, x
-                print(f'{self.__field[coordinate]:{self.margin()}s}', end='')
+                # print(f'{self.__field[coordinate]:{self.margin()}s}', end='')
+                print(formatter.alignment(self.__field[coordinate], self.margin()), end='')
             print()
-        print(desing.out_green(f'{"":10s}'))
+        print(formatter.fg_green(formatter.alignment("", 10)))
 
 
 

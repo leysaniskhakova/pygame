@@ -1,6 +1,8 @@
 
 class Player(object):
 
+    player_on_the_field = '*'
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
