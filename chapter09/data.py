@@ -11,13 +11,13 @@ def input_int(parameter, text=''):
             else:
                 print(formatter.fg_red('\nThe number must be positive!'))
         except ValueError:
-            print(formatter.fgred('\nEnter the number!'))
+            print(formatter.fg_red('\nEnter the number!'))
             pass
 
 
 def first_level():
     print(formatter.fg_green('\nEnter the size of the first playing field (number of cells in height and width):'))
-    return input_int(formatter.fg_blue('\nwidth'))+1, input_int(formatter.fg_blue('\nheight'))+1
+    return input_int(formatter.fg_blue('\nwidth')), input_int(formatter.fg_blue('\nheight'))
 
 
 def next_level():
@@ -39,7 +39,7 @@ def ask_for_action(question):
 
 def input_data():
     level_fields = {}
-    start = 0
+    start = 1
     width, height = first_level()
     rise, levels = next_level(), last_level()
 
@@ -61,3 +61,18 @@ d - step raight
 e - exit
 Enter: """
 
+
+def ask_yes_no(question):
+    """Ask a yes or no question."""
+    response = None
+    while response not in ("y", "n"):
+        response = input(question).lower()
+    if response == "y":
+      return True
+    elif response == "n":
+      return False 
+
+
+def message(text):
+    print(formatter.fg_red(f'{text}'))
+    input(formatter.fg_yellow("(press 'enter' to proceed)"))

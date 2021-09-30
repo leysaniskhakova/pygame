@@ -3,9 +3,10 @@ from random import choice
 
 class Field(object):
 
+    cell = '.'
+    empty = ' '
     symbol_obstacle = '#'
     symbol_energy = '+'
-    empty = '.'
 
 
     def __init__(self, x_size, y_size):
@@ -16,8 +17,8 @@ class Field(object):
         self.top_border = y_size[1]
         self.bottom_border = y_size[0]
 
-        self.x_line = range(x_size[0], x_size[1]+1)
-        self.y_line = range(y_size[1], y_size[0]-1, -1)
+        self.x_line = [x for x in range(x_size[0], x_size[1]+1)]
+        self.y_line = [y for y in range(y_size[0], y_size[1]+1)]
 
         for y in self.y_line:
             for x in self.x_line:
