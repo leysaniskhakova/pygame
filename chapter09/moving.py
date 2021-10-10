@@ -6,7 +6,7 @@ import data
 
 class Moving(object):
 
-    free_cell = 'free'
+    free_cell = data.free_cell()
 
     def __init__(self, field, player):
 
@@ -16,18 +16,24 @@ class Moving(object):
                                     formatter.alignment(self.square.cell, self.square.margin()))
 
     def render(self):
-        self.coordinate_relation()
-        self.player.energy_display()
+        self.handleCollisions()
+        self.player_energy_display()
         self.square.render()
 
-    def coordinate_relation(self):
-        if self.square.obstacle(self.player.get_player_coordinate()):
-            self.square.annihilation_obstacle(self.player.get_player_coordinate())
+    def player_energy_display(self):
+        data.print_blue_text(data.variable_text(data.string_energy_units(), self.player.energy_level()))
 
-        if self.square.energy(self.player.get_player_coordinate()):
-            self.square.annihilation_energy(self.player.get_player_coordinate())
+    def handleCollisions(self):
 
-        self.square[self.player.get_player_coordinate()] = self.player_on_the_field
+        player_coordinate = self.player.get_player_coordinate()
+
+        if self.square.obstacle(player_coordinate):
+            self.square.annihilation_obstacle(player_coordinate)
+
+        if self.square.energy(player_coordinate):
+            self.square.annihilation_energy(player_coordinate)
+
+        self.square[player_coordinate] = self.player_on_the_field
 
     def check_exit(self):
         return self.player.get_player_coordinate() != self.square.exit_coordinate()
@@ -39,10 +45,10 @@ class Moving(object):
 
     def not_energy(self, response):
         if response and self.player.energy_no():
-            data.message('Lack of energy!')
+            data.message(data.lack_of_energy())
 
     def ask_about_annihilation(self):
-        ask = formatter.fg_yellow('Destroy an obstacle for 10 energy units? (y/n)\n')
+        ask = formatter.fg_yellow(data.energy_question())
         return data.ask_yes_no(ask)
 
     def annihilation(self, coordinate):
@@ -72,13 +78,13 @@ class Moving(object):
 
         self.clean_cell()
 
-        if action == "a":
+        if action == data.response_left():
             self.step_left()
-        elif action == "d":
+        elif action == data.response_right():
             self.step_right()
-        elif action == "w":
+        elif action == data.response_up():
             self.step_up()
-        elif action == "s":
+        elif action == data.response_down():
             self.step_down()
 
         self.check_cell_energy()
@@ -92,19 +98,9 @@ class Moving(object):
             return self.annihilation(coordinate)
 
     def next_coordinate(self, action):
-        
-        if action == "a":
-            coordinate = self.square.left(self.player.get_player_coordinate())
-        elif action == "d":
-            coordinate = self.square.right(self.player.get_player_coordinate())
-        elif action == "w":
-            coordinate = self.square.up(self.player.get_player_coordinate())
-        elif action == "s":
-            coordinate = self.square.down(self.player.get_player_coordinate())
-
+        coordinate = data.route(action, self.player.get_player_coordinate())
         return self.status_coordinate(coordinate)
 
     def play(self, action):
-
         if self.next_coordinate(action) == self.free_cell:
             self.step(action)

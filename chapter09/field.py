@@ -4,6 +4,7 @@ import formatter
 
 class Field(object):
 
+    start = 0
     cell = '.'
     empty = ' '
     symbol_energy = '+'
@@ -12,20 +13,20 @@ class Field(object):
 
         self.__field = {}
 
-        self.borders = [(height[0]-1, x) for x in range(width[0]-1, width[1]+2)] + \
-                       [(height[1]+1, x) for x in range(width[0]-1, width[1]+2)] + \
-                       [(y, width[0]-1) for y in range(height[0]-1, height[1]+2)] + \
-                       [(y, width[1]+1) for y in range(height[0]-1, height[1]+2)]
+        self.borders = [(self.start, x) for x in range(self.start, width +2)] + \
+                       [(height + 1, x) for x in range(self.start, width +2)] + \
+                       [(y, self.start) for y in range(self.start, height+2)] + \
+                       [(y, width  + 1) for y in range(self.start, height+2)]
 
-        self.__corners = [(height[0]-1, width[0]-1), (height[0]-1, width[1]+1), \
-                        (height[1]+1, width[0]-1), (height[1]+1, width[1]+1)]
+        self.__corners = [(self.start, self.start), (self.start, width+1), \
+                          (height + 1, self.start), (height + 1, width+1)]
                         
         self.__exit = choice(list(set(self.borders) - set(self.__corners)))
 
-        self.__x_line = [x for x in range(width[0], width[1]+1)]
-        self.__y_line = [y for y in range(height[0], height[1]+1)]
-        self.all_height = [height[0]-1] + self.__y_line + [height[1]+1]
-        self.all_width  = [width[0]-1] + self.__x_line + [width[1]+1]
+        self.__x_line = [x for x in range(self.start+1, width +1)]
+        self.__y_line = [y for y in range(self.start+1, height+1)]
+        self.all_height = [self.start] + self.__y_line + [height+1]
+        self.all_width  = [self.start] + self.__x_line + [width +1]
 
         self.field_coordinates = [(y, x) for x in self.__x_line for y in self.__y_line]
 
@@ -83,18 +84,6 @@ class Field(object):
         self.__obstacles.remove(coordinate)
         self.empty_cell(coordinate)
         
-    def left(self, coordinate):
-        return coordinate[0], coordinate[1]-1
-
-    def right(self, coordinate):
-        return coordinate[0], coordinate[1]+1
-
-    def up(self, coordinate):
-        return coordinate[0]-1, coordinate[1]
-
-    def down(self, coordinate):
-        return coordinate[0]+1, coordinate[1]
-
     def margin(self):    
         margin = max(
                 len(str(self.__x_line[0])),

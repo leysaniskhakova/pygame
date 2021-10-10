@@ -11,7 +11,7 @@ import sys
 
 def main():
 
-    print(formatter.fg_yellow('\t\tWelcome!\n'))
+    data.print_yellow_text(data.welcome())
     
     level_and_field = data.input_data()
 
@@ -31,25 +31,25 @@ def main():
         action = None
 
         while game.check_exit():
-            print(formatter.fg_yellow(f'\t\tlevel: {level}\n'))
+            data.print_yellow_text(data.variable_text(data.string_level(), level))
             game.render()
             action = data.ask_for_action(formatter.fg_red(data.step_question()))
-            if action != 'e':
+            if action != data.stop():
                 game.play(action)
             else:
-                print(formatter.fg_yellow('\n\t\tCome back!'))
+                data.print_yellow_text(data.goodbye())
                 break
 
             formatter.clear()
 
-        if action == 'e':
+        if action == data.stop():
             break
             
         number_of_levels += 1
         player_energy = player.energy_level()
 
     if number_of_levels == len(level_and_field):
-        print(formatter.fg_yellow('\n\tCongratulations!\n\tYou have found a way out!'))
+        data.print_yellow_text(data.congratulation())
 
 if __name__ == "__main__":
     print()

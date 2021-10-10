@@ -42,6 +42,3 @@ class Player(object):
 
     def energy_is(self):
       return self.energy >= 10
-
-    def energy_display(self):
-      print(formatter.fg_blue(f'\t energy units: {self.energy}\n'))
