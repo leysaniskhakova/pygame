@@ -6,12 +6,14 @@ from moving import Moving
 from random import choice
 import formatter
 import data
+import string
+import way
 import sys
 
 
 def main():
 
-    data.print_yellow_text(data.welcome())
+    data.print_yellow_text(string.welcome())
     
     level_and_field = data.input_data()
 
@@ -31,25 +33,25 @@ def main():
         action = None
 
         while game.check_exit():
-            data.print_yellow_text(data.variable_text(data.string_level(), level))
+            data.print_yellow_text(data.string_level(level))
             game.render()
-            action = data.ask_for_action(formatter.fg_red(data.step_question()))
-            if action != data.stop():
+            action = data.ask_for_action(formatter.fg_red(string.step_question()))
+            if action != 'e':
                 game.play(action)
             else:
-                data.print_yellow_text(data.goodbye())
+                data.print_yellow_text(string.goodbye())
                 break
 
             formatter.clear()
 
-        if action == data.stop():
+        if action == 'e':
             break
             
         number_of_levels += 1
         player_energy = player.energy_level()
 
     if number_of_levels == len(level_and_field):
-        data.print_yellow_text(data.congratulation())
+        data.print_yellow_text(string.congratulation())
 
 if __name__ == "__main__":
     print()

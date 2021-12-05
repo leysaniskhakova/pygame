@@ -2,11 +2,13 @@ from field import Field
 from player import Player
 import formatter
 import data
+import string
+import way
 
 
 class Moving(object):
 
-    free_cell = data.free_cell()
+    free_cell = 'free'
 
     def __init__(self, field, player):
 
@@ -21,7 +23,7 @@ class Moving(object):
         self.square.render()
 
     def player_energy_display(self):
-        data.print_blue_text(data.variable_text(data.string_energy_units(), self.player.energy_level()))
+        data.print_blue_text(data.string_energy_units(self.player.energy_level()))
 
     def handleCollisions(self):
 
@@ -45,10 +47,10 @@ class Moving(object):
 
     def not_energy(self, response):
         if response and self.player.energy_no():
-            data.message(data.lack_of_energy())
+            data.message(string.lack_of_energy())
 
     def ask_about_annihilation(self):
-        ask = formatter.fg_yellow(data.energy_question())
+        ask = formatter.fg_yellow(string.energy_question())
         return data.ask_yes_no(ask)
 
     def annihilation(self, coordinate):
@@ -78,13 +80,13 @@ class Moving(object):
 
         self.clean_cell()
 
-        if action == data.response_left():
+        if action == 'a':
             self.step_left()
-        elif action == data.response_right():
+        elif action == 'd':
             self.step_right()
-        elif action == data.response_up():
+        elif action == 'w':
             self.step_up()
-        elif action == data.response_down():
+        elif action == 's':
             self.step_down()
 
         self.check_cell_energy()
@@ -98,7 +100,7 @@ class Moving(object):
             return self.annihilation(coordinate)
 
     def next_coordinate(self, action):
-        coordinate = data.route(action, self.player.get_player_coordinate())
+        coordinate = way.route(action, self.player.get_player_coordinate())
         return self.status_coordinate(coordinate)
 
     def play(self, action):
